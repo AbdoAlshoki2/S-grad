@@ -39,6 +39,38 @@ class Scalar:
         
         out._backward = _backward
         return out
+    
+    def sin(self):
+        out = Scalar(math.sin(self.data) , (self,))
+        def _backward():
+            self.grad += math.cos(self.data) * out.grad
+        out._backward = _backward
+        return out
+
+    def exp(self):
+        out = Scalar(math.exp(self.data) , (self,))
+        def _backwward():
+            self.grad += out.data * out.grad
+        out._backward = _backwward
+        return out
+
+    def log(self):
+        if self.data <= 0: # not implemented for negative bases
+          raise ValueError("Cannot compute log of non-positive value")
+        
+        out = Scalar(math.log(self.data) , (self,))
+        def _backward():
+            self.grad += (1.0/self.data) * out.grad 
+        out._backward = _backward
+        return out     
+
+    def relu(self):
+      out = Scalar(max(self.data , 0) , (self,))
+      def _backward():
+        self.grad += (out.data > 0) * out.grad
+      out._backward = _backward
+
+      return out
 
     def __truediv__(self, other):
         return self * other**-1
