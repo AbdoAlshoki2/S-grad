@@ -112,12 +112,7 @@ class Scalar:
         return out
 
     def sigmoid(self):
-
-        neg_self = self * -1
-        exp_term = neg_self.exp()
-        one = Scalar(1.0)
-        denom = one + exp_term
-        out = one / denom
+        out = Scalar(1.0 / (1.0 + (-self).exp()), (self,))
         def _backward():
             self.grad += (out.data * (1 - out.data)) * out.grad
         out._backward = _backward
@@ -125,11 +120,8 @@ class Scalar:
     
     def tanh(self):
 
-        pos_exp = (self * 2).exp()
-        neg_exp = (self * -2).exp()
-        num = pos_exp - neg_exp
-        denom = pos_exp + neg_exp
-        out = num / denom 
+        t = (math.exp(2 * self.data) - 1) / (math.exp(2 * self.data) + 1)
+        out = Scalar(t, (self,))
         def _backward():
             self.grad += (1 - out.data**2) * out.grad
         out._backward = _backward
